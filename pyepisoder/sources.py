@@ -222,8 +222,13 @@ class TVDBOnline(object):
 			show.status = Show.ENDED
 
 		# load episodes
-		episodes = sorted(self._fetch_episodes(show, 1, user_agent))
-		for (idx, episode) in enumerate(episodes):
+		try:
+			episodes = self._fetch_episodes(show, 1, user_agent)
+		except TVDBShowNotFoundError:
+			#raise
+			return
+
+		for (idx, episode) in enumerate(sorted(episodes)):
 
 			episode.totalnum = idx + 1
 			db.add_episode(episode, show)
