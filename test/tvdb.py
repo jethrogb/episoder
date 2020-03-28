@@ -389,6 +389,15 @@ class TVDBTest(TestCase):
 		episodes = self.db.get_episodes(date(1988,1,1), 99999)
 		self.assertEqual(len(episodes), 0)
 
+	def test_parse_show_with_data_0000_00_00(self):
+
+		show = self.db.add_show(Show(u"unnamed show", url=u"75397"))
+
+		self.tvdb.login(self.args)
+		self.tvdb.parse(show, self.db, self.args)
+		episodes = self.db.get_episodes(date(1988,1,1), 99999)
+		self.assertEqual(len(episodes), 1)
+
 	def test_user_agent(self):
 
 		show = self.db.add_show(Show(u"unnamed show", url=u"262"))

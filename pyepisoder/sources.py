@@ -173,13 +173,21 @@ class TVDBOnline(object):
 
 	def _fetch_episodes(self, show, page, agent):
 
+		def airdate(row):
+
+			aired = row.get("firstAired")
+
+			if aired == "0000-00-00":
+				return datetime(1970, 1, 1)
+
+			return datetime.strptime(aired, "%Y-%m-%d").date()
+
 		def mkepisode(row):
 
 			num = int(row.get("airedEpisodeNumber", "0") or 0)
-			aired = row.get("firstAired")
 			name = row.get("episodeName") or u"Unnamed episode"
 			season = int(row.get("airedSeason", "0") or 0)
-			aired = datetime.strptime(aired, "%Y-%m-%d").date()
+			aired = airdate(row)
 			pnum = u"UNK"
 
 			self._log.debug("Found episode %s", name)
