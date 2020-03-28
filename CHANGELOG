@@ -1,4 +1,4 @@
-== v0.8.4 (UNRELEASED) ==
+== v0.8.4 (28 Mar 2020) ==
  * Fix loading of shows without episodes from TVDB
  * Fix loading of episodes with invalid date (0000-00-00)
 
