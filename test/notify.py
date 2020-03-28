@@ -1,4 +1,4 @@
-# episoder, https://github.com/cockroach/episoder
+# episoder, https://code.ott.net/episoder
 # -*- coding: utf8 -*-
 # # Copyright (C) 2004-2020 Stefan Ott. All rights reserved.
 #
