@@ -17,6 +17,7 @@
 
 import logging
 
+from bs4 import BeautifulSoup
 from re import search, match
 from json import dumps
 from datetime import datetime
@@ -358,14 +359,43 @@ class Epguides(object):
 		if res:
 			fields = res.groups()
 			(total, season, epnum, prodnum, day, title) = fields
+		elif "<td class='epinfo" in line:
+			def contents(field):
+				if not len(field.contents):
+					return ""
+				else:
+					return field.contents[0].strip()
 
-			day = day.replace("/", " ")
-			airtime = datetime.strptime(day, "%d %b %y")
+			line = BeautifulSoup(line, "html.parser")
+			epinfos = line.find_all('td', class_='epinfo')
+			if all(not contents(epinfo) for epinfo in epinfos):
+				# Some shows have empty lines
+				return
 
-			self.logger.debug("Found episode %s", title)
-			db.add_episode(Episode(title, season or 0, epnum,
-					airtime.date(), prodnum, total), show)
+			total = contents(epinfos[0]).split(".",1)[0]
+			try:
+				total = int(total)
+			except ValueError:
+				# Some shows have specials, which are numbered separately
+				total = -1
+			[season, epnum] = contents(epinfos[1]).split("-")
+			day = contents(epinfos[2])
+			if not day:
+				# Some episodes don't have dates
+				day = "01 Jan 70"
 
+			title = contents(line.find('td', class_='eptitle').find('a'))
+
+			prodnum = None
+		else:
+			return
+
+		day = day.replace("/", " ")
+		airtime = datetime.strptime(day, "%d %b %y")
+
+		self.logger.debug("Found episode %s", title)
+		db.add_episode(Episode(title, season or 0, epnum,
+				airtime.date(), prodnum, total), show)
 
 class TVCom(object):
 
